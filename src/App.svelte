@@ -8,6 +8,10 @@
 </main>
 
 <style>
+	@tailwind base;
+	@tailwind components;
+	@tailwind utilities;
+
 	main {
 		text-align: center;
 		padding: 1em;
