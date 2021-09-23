@@ -2,7 +2,7 @@
   import Speedometer from "svelte-speedometer";
   import Slider from "../components/Slider.svelte";
   import Button from "../components/Button.svelte";
-  import { create_rocket, update_rocket } from "../rockets";
+  import { create_rocket, launch_rocket, update_rocket } from "../rockets";
   import { onMount } from "svelte";
 
   let height=20
@@ -18,11 +18,14 @@
   $: {
     if (rid !== "") {
       update_rocket(rid, height, num_engines)
-      .then(resp => console.log(resp.data))
+      .then(resp => resp && console.log(resp.data))
     }
   }
 
   function handleLaunch() {
+    launch_rocket(rid, event => {
+      console.log(event)
+    })
   }
 </script>
 

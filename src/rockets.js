@@ -39,3 +39,23 @@ export async function update_rocket(id, height, num_engines) {
     console.log(error);
   }
 }
+
+export async function launch_rocket(id, callback) {
+  const token = get(auth).token;
+  try {
+    // Send launch command
+    await axios.put(
+      `http://localhost:8002/rockets/${id}/launch`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    // create websocket
+    var ws = new WebSocket(`ws://localhost:8002/rocket/${id}/ws`);
+    ws.onmessage = callback;
+  } catch (error) {
+    console.log(error);
+  }
+}
