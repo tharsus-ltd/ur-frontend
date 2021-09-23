@@ -3,6 +3,7 @@
   import Button from "../components/Button.svelte";
   import Rocket from "../components/Rocket.svelte";
   import { auth, logout } from "../store";
+  import { create_rocket } from "../rockets";
 
   let username;
 
@@ -15,7 +16,6 @@
   })
 
   function add_rocket() {
-
   }
 </script>
 
