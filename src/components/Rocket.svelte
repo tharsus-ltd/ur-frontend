@@ -5,24 +5,27 @@
   import { create_rocket, launch_rocket, update_rocket, start_websocket } from "../rockets";
   import { onMount } from "svelte";
 
-  export let height=20
-  export let num_engines=1
+  export let height = 20
+  export let num_engines = 1
   export let rid = ""
-  export let altitude=0
-  export let crashed=false
+  export let altitude = 0
+  export let crashed = false
+  export let launched = false
+  export let status
 
-  $: on_ground = altitude <= 0 && !crashed
-  $: status = crashed ? "Crashed 😥🔥🚒" : altitude <= 0 ? "Ready! 🚀" : "Flying!🥳"
+  $: on_ground = !launched && !crashed
 
   function liveUpdate(rocket) {
     altitude = rocket.altitude
     crashed = rocket.crashed
+    status = rocket.status
   }
 
   onMount(async () => {
     if (rid === "") {
       const rocket = await create_rocket(height, num_engines)
       rid = rocket.id;
+      status = rocket.status
     } else {
       start_websocket(rid, event => liveUpdate(JSON.parse(event.data).rocket))
     }
