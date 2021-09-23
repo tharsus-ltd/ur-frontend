@@ -2,17 +2,30 @@
   import Speedometer from "svelte-speedometer";
   import Slider from "../components/Slider.svelte";
   import Button from "../components/Button.svelte";
-  import { create_rocket, launch_rocket, update_rocket } from "../rockets";
+  import { create_rocket, launch_rocket, update_rocket, start_websocket } from "../rockets";
   import { onMount } from "svelte";
 
-  let height=20
-  let num_engines=1
-  let rid = ""
-  let altitude=20
+  export let height=20
+  export let num_engines=1
+  export let rid = ""
+  export let altitude=0
+  export let crashed=false
+
+  $: on_ground = altitude <= 0 && !crashed
+  $: status = crashed ? "Crashed 😥🔥🚒" : altitude <= 0 ? "Ready! 🚀" : "Flying!🥳"
+
+  function liveUpdate(rocket) {
+    altitude = rocket.altitude
+    crashed = rocket.crashed
+  }
 
   onMount(async () => {
-    const rocket = await create_rocket(height, num_engines)
-    rid = rocket.id;
+    if (rid === "") {
+      const rocket = await create_rocket(height, num_engines)
+      rid = rocket.id;
+    } else {
+      start_websocket(rid, event => liveUpdate(JSON.parse(event.data).rocket))
+    }
   })
 
   $: {
@@ -22,29 +35,34 @@
     }
   }
 
-  function handleLaunch() {
-    launch_rocket(rid, event => {
-      console.log(event)
-    })
+  async function handleLaunch() {
+    await launch_rocket(rid)
+    start_websocket(rid, event => liveUpdate(JSON.parse(event.data).rocket))
   }
 </script>
 
 <div class="p-4 md:w-3/4">
   <div class="flex rounded-lg h-full bg-gray-100 p-8 flex-col">
+    <div class="flex flex-row">
+      <div class="text-lg mx-auto">Rocket ID: {rid}</div>
+      <div class="text-lg mx-auto">Status: {status}</div>
+    </div>
+
     <div class="md:flex">
       <div class="flex-grow">
         <div class="md:flex">
-          <p class="self-center text-xl w-8">Height:</p> <Slider min_val=20 max_val=200 bind:value={height} />
+          <p class="self-center text-xl w-8">Height:</p> <Slider min_val=20 max_val=200 bind:value={height} bind:enabled={on_ground} />
         </div>
         <div class="md:flex">
-          <p class="self-center text-xl w-8">Engines:</p> <Slider min_val=1 max_val=8 bind:value={num_engines} />
+          <p class="self-center text-xl w-8">Engines:</p> <Slider min_val=1 max_val=8 bind:value={num_engines} bind:enabled={on_ground} />
         </div>
       </div>
 
       <div class="w-48 mx-auto">
         <Speedometer
-          bind:value={altitude}
-          minValue=0
+          forceRender={true}
+          value={altitude}
+          minValue=-1
           maxValue=180000
           segments=1
           needleColor="#DB2777"
@@ -52,6 +70,7 @@
           fluidWidth=true
           needleHeightRatio=0.7
           valueFormat="d"
+          needleTransitionDuration=0
         />
       </div>
     </div>

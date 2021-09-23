@@ -3,17 +3,23 @@
   export let min_val
   export let max_val
   export let value
+  export let enabled = true
+  let pointer = "cursor-pointer"
   let perc = getPerc()
 
   function getPerc() {
     return Math.round(((Number(value) - Number(min_val)) / (Number(max_val) - Number(min_val))) * 100);
   }
 
+  $:  pointer = enabled ? "cursor-pointer" : "";
+
 	function handlePanMove(event) {
-		perc += event.detail.dx*0.45
-    perc = perc > 100 ? 100 : perc
-    perc = perc < 0 ? 0 : perc
-    value = Math.round(Number(min_val) + (Number(max_val) - Number(min_val)) * (perc/100))
+    if (enabled) {
+      perc += event.detail.dx*0.45
+      perc = perc > 100 ? 100 : perc
+      perc = perc < 0 ? 0 : perc
+      value = Math.round(Number(min_val) + (Number(max_val) - Number(min_val)) * (perc/100))
+    }
 	}
 </script>
 
@@ -22,7 +28,7 @@
     <div class="h-2 bg-gray-200 rounded-full">
       <div class="absolute h-2 rounded-full bg-teal-600 w-0" style="width: 58%;"></div>
       <div
-        class="absolute h-4 flex items-center justify-center w-4 rounded-full bg-red-700 shadow border border-gray-300 -ml-2 top-0 cursor-pointer"
+        class="absolute h-4 flex items-center justify-center w-4 rounded-full bg-red-700 shadow border border-gray-300 -ml-2 top-0 {pointer}"
         use:pannable
         on:panmove={handlePanMove}
         style="left: {perc}%;"
