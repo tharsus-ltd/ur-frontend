@@ -4,7 +4,7 @@
   import Rocket from "../components/Rocket.svelte";
   import { onMount } from "svelte";
   import { auth, logout } from "../store";
-  import { get_rockets } from "../rockets";
+  import { get_rockets, create_rocket } from "../rockets";
 
   let username;
   let rockets = [];
@@ -21,8 +21,9 @@
     rockets = await get_rockets()
   })
 
-  function add_rocket() {
-    rockets = [...rockets, { rid:"", num_engines:1, height:30, altitude: 0, crashed: false } ];
+  async function add_rocket() {
+    const rocket = await create_rocket(30, 1)
+    rockets = [...rockets, rocket ];
   }
 </script>
 
@@ -33,10 +34,7 @@
   <div class="flex flex-col mx-auto">
     {#each rockets as rocket (rocket.id)}
       <Rocket
-        rid={rocket.id}
-        num_engines={rocket.num_engines}
-        height={rocket.height}
-        altitude={rocket.altitude}
+        rocket={rocket}
       />
     {/each}
     <div class="mx-auto flex-shrink">
