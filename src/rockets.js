@@ -2,7 +2,7 @@ import axios from "axios";
 import { get } from "svelte/store";
 import { auth } from "./store";
 
-const HOST = "localhost:8002";
+const HOST = "localhost/rocket-manager/";
 
 export async function create_rocket(height, num_engines) {
   const token = get(auth).token;

@@ -2,7 +2,8 @@ import { writable } from "svelte/store";
 import { push } from "svelte-spa-router";
 import axios from "axios";
 
-const URL_BASE = "http://localhost:8001";
+export const VERSION = "0.1.0";
+const URL_BASE = "http://localhost/user-manager";
 
 export const auth = writable(null);
 
