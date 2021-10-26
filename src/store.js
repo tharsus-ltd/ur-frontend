@@ -9,7 +9,6 @@ export const auth = writable(null);
 
 export function logout() {
   auth.update(() => null);
-  push("/");
 }
 
 export function set_form(user_name, password) {
@@ -24,9 +23,11 @@ export async function register(user_name, password) {
     await axios.post(`${URL_BASE}/register`, set_form(user_name, password), {
       headers: { "Content-Type": "application/form-data" },
     });
+    return true;
   } catch (error) {
-    console.error(error);
+    alert("registration failed 😥");
     logout();
+    return false;
   }
 }
 
@@ -48,8 +49,10 @@ export async function get_token(user_name, password) {
       username,
       token,
     }));
+    return true;
   } catch (error) {
-    console.error(error);
+    alert("login failed 😥");
     logout();
+    return false;
   }
 }
